@@ -60,7 +60,7 @@ static NSTimeInterval g_defaultTimeout = 60.0;
 
 static FBSDKErrorConfiguration *g_errorConfiguration;
 
-#if !TARGET_OS_TV
+#if TARGET_OS_IOS || TARGET_OS_MACCATALYST
 static FBSDKAccessToken *_CreateExpiredAccessToken(FBSDKAccessToken *accessToken)
 {
   if (accessToken == nil) {
@@ -99,7 +99,7 @@ typedef NS_ENUM(NSUInteger, FBSDKGraphRequestConnectionState)
 
 @interface FBSDKGraphRequestConnection () <
 NSURLSessionDataDelegate
-#if !TARGET_OS_TV
+#if TARGET_OS_IOS || TARGET_OS_MACCATALYST
 , FBSDKGraphErrorRecoveryProcessorDelegate
 #endif
 >
@@ -120,7 +120,7 @@ NSURLSessionDataDelegate
   NSString *_overrideVersionPart;
   NSUInteger _expectingResults;
   NSOperationQueue *_delegateQueue;
-#if !TARGET_OS_TV
+#if TARGET_OS_IOS || TARGET_OS_MACCATALYST
   FBSDKGraphRequestMetadata *_recoveringRequestMetadata;
   FBSDKGraphErrorRecoveryProcessor *_errorRecoveryProcessor;
 #endif
@@ -754,7 +754,7 @@ NSURLSessionDataDelegate
       disabledRecoveryCount++;
     }
   }
-#if !TARGET_OS_TV
+#if TARGET_OS_IOS || TARGET_OS_MACCATALYST
   BOOL isSingleRequestToRecover = (count - disabledRecoveryCount == 1);
 #endif
 
@@ -768,7 +768,7 @@ NSURLSessionDataDelegate
       body = [FBSDKTypeUtility dictionaryValue:resultDictionary[@"body"]];
     }
 
-#if !TARGET_OS_TV
+#if TARGET_OS_IOS || TARGET_OS_MACCATALYST
     if (resultError && !metadata.request.graphErrorRecoveryDisabled && isSingleRequestToRecover) {
       self->_recoveringRequestMetadata = metadata;
       self->_errorRecoveryProcessor = [[FBSDKGraphErrorRecoveryProcessor alloc] init];
@@ -804,7 +804,7 @@ NSURLSessionDataDelegate
     }
   };
 
-#if !TARGET_OS_TV
+#if TARGET_OS_IOS || TARGET_OS_MACCATALYST
   void (^clearToken)(NSInteger) = ^(NSInteger errorSubcode){
     if (metadata.request.flags & FBSDKGraphRequestFlagDoNotInvalidateTokenOnError) {
       return;
@@ -1112,7 +1112,7 @@ totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend
 
 #pragma mark - FBSDKGraphErrorRecoveryProcessorDelegate
 
-#if !TARGET_OS_TV
+#if TARGET_OS_IOS || TARGET_OS_MACCATALYST
 - (void)processorDidAttemptRecovery:(FBSDKGraphErrorRecoveryProcessor *)processor didRecover:(BOOL)didRecover error:(NSError *)error
 {
   if (didRecover) {
